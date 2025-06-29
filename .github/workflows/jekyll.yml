@@ -16,8 +16,7 @@ permissions:
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# Allow only one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -32,28 +31,18 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          # This version is compatible with the Chirpy theme and its dependencies
-          ruby-version: '3.1' 
-          # This caches the installed gems to speed up future builds
+          ruby-version: '3.1'
+          # This caches the installed gems from your Gemfile to speed up future builds
           bundler-cache: true 
-          
-      # This is the step that was missing before.
-      # It installs the gems from your _config.yml and Gemfile.
-      # The theme and plugins are specified in the config file.
-      - name: Setup Jekyll
-        run: |
-          # Add the theme and paginator to a Gemfile
-          echo "gem 'jekyll-theme-chirpy'" >> Gemfile
-          echo "gem 'jekyll-paginate-v2'" >> Gemfile
-          bundle install
 
       - name: Build with Jekyll
-        # Use the JEKYLL_ENV environment variable to specify the production environment.
-        run: bundle exec jekyll build --baseurl "${{ steps.deploy.outputs.base_url }}"
+        # This command tells Jekyll to build the site for production
+        run: bundle exec jekyll build
         env:
           JEKYLL_ENV: production
+
       - name: Upload artifact
-        # Automatically uploads the built '_site' folder.
+        # This uploads the built '_site' folder for the deployment job
         uses: actions/upload-pages-artifact@v3
 
   # Deployment job
