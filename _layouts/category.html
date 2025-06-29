@@ -1,41 +1,40 @@
 ---
-# This tells our layout to use the main 'default' layout from the Chirpy theme as its base.
-layout: default
+# This is the fix. Inherit from 'page' to get the correct content structure.
+layout: page
 ---
 
-<div class="page-content">
-  <h1 class="page-title">
-    {{ page.title }}
-  </h1>
-  <hr>
+<!-- The h1 title will be automatically handled by the 'page' layout,
+     so we can remove our custom one to avoid duplicates. -->
 
-  <ul class="post-list">
-    {% for post in paginator.posts %}
-      <li>
-        <h2 class="post-title" style="margin-bottom: 0.2rem;">
-          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-        </h2>
-        <span class="post-meta">{{ post.date | date: "%Y年%m月%d日" }}</span>
-      </li>
-    {% endfor %}
-  </ul>
+<!-- This is the list of posts for the current page of this specific category -->
+<ul class="post-list">
+  {% for post in paginator.posts %}
+    <li>
+      <h2 class="post-title" style="margin-bottom: 0.2rem;">
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      </h2>
+      <span class="post-meta">{{ post.date | date: "%Y年%m月%d日" }}</span>
+    </li>
+  {% endfor %}
+</ul>
 
-  {% if paginator.total_pages > 1 %}
-    <div class="pagination">
-      {% if paginator.previous_page %}
-        <a href="{{ paginator.previous_page_path | relative_url }}" class="previous">Newer Posts</a>
-      {% else %}
-        <span class="previous" style="color: grey;">Newer Posts</span>
-      {% endif %}
-      
-      <span class="page_number" style="margin: 0 1em;">Page {{ paginator.page }} of {{ paginator.total_pages }}</span>
-      
-      {% if paginator.next_page %}
-        <a href="{{ paginator.next_page_path | relative_url }}" class="next">Older Posts</a>
-      {% else %}
-        <span class="next" style="color: grey;">Older Posts</span>
-      {% endif %}
-    </div>
-  {% endif %}
-
-</div>
+<!-- This adds the "Newer/Older Posts" pagination links at the bottom -->
+{% if paginator.total_pages > 1 %}
+  <div class="pagination text-center">
+    {% if paginator.previous_page %}
+      <a href="{{ paginator.previous_page_path | relative_url }}" class="btn btn-outline-primary">
+        <i class="fas fa-chevron-left"></i>
+        Newer Posts
+      </a>
+    {% endif %}
+    
+    <span class="page_number" style="margin: 0 1em;">Page {{ paginator.page }} of {{ paginator.total_pages }}</span>
+    
+    {% if paginator.next_page %}
+      <a href="{{ paginator.next_page_path | relative_url }}" class="btn btn-outline-primary">
+        Older Posts
+        <i class="fas fa-chevron-right"></i>
+      </a>
+    {% endif %}
+  </div>
+{% endif %}
