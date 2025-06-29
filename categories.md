@@ -2,6 +2,7 @@
 # categories.md
 layout: page
 title: Categories
+permalink: /categories/ 
 ---
 
 Here is a list of all post categories in this archive.
