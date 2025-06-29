@@ -1,0 +1,19 @@
+---
+layout: page
+title: All Categories
+permalink: /categories/
+---
+
+<h1>All Categories</h1>
+<p>Click a category to see all posts within it.</p>
+
+<ul>
+  {% for category in site.categories %}
+    {% assign category_name = category[0] %}
+    <li>
+      <a href="{{ site.baseurl }}/category/{{ category_name | url_encode }}.html">
+        {{ category_name }} ({{ category[1].size }} posts)
+      </a>
+    </li>
+  {% endfor %}
+</ul>
