@@ -1,9 +1,10 @@
 source "https://rubygems.org"
 
-group :jekyll_plugins do
-  gem "jekyll"
-  gem "jekyll-theme-chirpy"
-  gem "jekyll-seo-tag"
-  gem "jekyll-feed"
-  gem "jekyll-sitemap"
-end
+gem "jekyll"
+gem "jekyll-theme-chirpy"
+
+gem "jekyll-paginate-v2"
+
+gem "jekyll-seo-tag"
+gem "jekyll-feed"
+gem "jekyll-sitemap"
