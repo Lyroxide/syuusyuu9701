@@ -33,75 +33,97 @@ permalink: /categories/
   <button id="next-page" class="btn btn-sm btn-outline-secondary">Next</button>
 </div>
 
-<!-- Updated JavaScript with pagination -->
+<!-- Simple JavaScript with pagination -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Get DOM elements
     const postList = document.getElementById('post-list-all');
-    if (!postList) return;
-
-    const postItems = Array.from(postList.getElementsByClassName('post-item'));
     const categoryButtons = document.querySelectorAll('#category-buttons .btn');
-    
-    // Pagination elements
     const prevPageBtn = document.getElementById('prev-page');
     const nextPageBtn = document.getElementById('next-page');
     const pageIndicator = document.getElementById('page-indicator');
     
-    // Pagination variables
+    if (!postList) return;
+    
+    // Get all post items
+    const postItems = Array.from(postList.getElementsByClassName('post-item'));
+    
+    // Pagination settings
     const postsPerPage = 5;
     let currentPage = 1;
     let filteredPosts = [];
-    let currentCategory = 'all';
     
-    // Filter posts by category and update pagination
-    function filterPosts(category) {
-      currentCategory = category;
-      currentPage = 1; // Reset to first page when changing categories
+    // Show posts for current page and category
+    function updateDisplay() {
+      // Calculate pagination
+      const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+      const startIndex = (currentPage - 1) * postsPerPage;
+      const endIndex = Math.min(startIndex + postsPerPage, filteredPosts.length);
       
-      categoryButtons.forEach(button => {
-        button.classList.toggle('active', button.dataset.category === category);
-      });
-
-      // Filter posts by category
-      filteredPosts = postItems.filter(item =>
-        category === 'all' || item.dataset.category === category
-      );
+      // Update pagination controls
+      pageIndicator.textContent = `Page ${currentPage} of ${totalPages || 1}`;
+      prevPageBtn.disabled = currentPage <= 1;
+      nextPageBtn.disabled = currentPage >= totalPages;
       
-      // Hide all posts first
+      // Hide all posts
       postItems.forEach(item => {
         item.style.display = 'none';
       });
       
-      // Update pagination and display current page
-      updatePagination();
+      // Show only current page posts
+      for (let i = startIndex; i < endIndex; i++) {
+        if (filteredPosts[i]) {
+          filteredPosts[i].style.display = 'list-item';
+        }
+      }
     }
     
-    // Update pagination controls and display current page of posts
-    function updatePagination() {
-      const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+    // Filter posts by category
+    function filterByCategory(category) {
+      // Reset to first page
+      currentPage = 1;
       
-      // Update page indicator
-      pageIndicator.textContent = `Page ${currentPage} of ${totalPages || 1}`;
-      
-      // Enable/disable pagination buttons
-      prevPageBtn.disabled = currentPage <= 1;
-      nextPageBtn.disabled = currentPage >= totalPages || totalPages === 0;
-      
-      // Calculate which posts to show
-      const startIndex = (currentPage - 1) * postsPerPage;
-      const endIndex = startIndex + postsPerPage;
-      
-      // Show only posts for current page
-      filteredPosts.forEach((item, index) => {
-        item.style.display = (index >= startIndex && index < endIndex) ? 'list-item' : 'none';
+      // Update active button
+      categoryButtons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.category === category) {
+          btn.classList.add('active');
+        }
       });
+      
+      // Filter posts
+      if (category === 'all') {
+        filteredPosts = [...postItems];
+      } else {
+        filteredPosts = postItems.filter(item =>
+          item.dataset.category === category
+        );
+      }
+      
+      // Update display
+      updateDisplay();
     }
     
-    // Event listeners for pagination buttons
+    // Add click handlers to category buttons
+    categoryButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const category = this.dataset.category;
+        filterByCategory(category);
+        
+        // Update URL
+        if (category === 'all') {
+          history.replaceState(null, null, window.location.pathname);
+        } else {
+          history.pushState(null, null, '#' + category);
+        }
+      });
+    });
+    
+    // Add click handlers to pagination buttons
     prevPageBtn.addEventListener('click', function() {
       if (currentPage > 1) {
         currentPage--;
-        updatePagination();
+        updateDisplay();
       }
     });
     
@@ -109,42 +131,25 @@ permalink: /categories/
       const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
       if (currentPage < totalPages) {
         currentPage++;
-        updatePagination();
+        updateDisplay();
       }
     });
-
-    // Category button click handlers
-    categoryButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        const categoryToFilter = this.dataset.category;
-        filterPosts(categoryToFilter);
-        
-        // Update the URL hash without reloading the page
-        if (history.pushState) {
-          if (categoryToFilter === 'all') {
-            history.replaceState(null, null, window.location.pathname + window.location.search);
-          } else {
-            history.pushState(null, null, '#' + encodeURIComponent(categoryToFilter));
-          }
-        }
-      });
-    });
-
-    // Handle URL hash changes (e.g., from links or browser history)
-    function filterByUrlHash() {
-      const hash = decodeURIComponent(window.location.hash.substring(1));
+    
+    // Handle URL hash on page load
+    function handleUrlHash() {
+      const hash = window.location.hash.substring(1);
       if (hash) {
-        filterPosts(hash);
+        filterByCategory(decodeURIComponent(hash));
       } else {
-        filterPosts('all'); // Default to showing all posts
+        filterByCategory('all');
       }
     }
     
-    // Initial filter when the page loads
-    filterByUrlHash();
-
-    // Listen for back/forward browser button presses
-    window.addEventListener('popstate', filterByUrlHash);
+    // Initialize page
+    handleUrlHash();
+    
+    // Handle browser back/forward
+    window.addEventListener('popstate', handleUrlHash);
   });
 </script>
 
