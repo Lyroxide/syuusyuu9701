@@ -1,0 +1,39 @@
+---
+# _layouts/category.html
+layout: default
+---
+
+<div id="post-list">
+  <h1 class="page-title mb-4">
+    Category: <span class="text-capitalize">{{ page.title | remove: "Category: " }}</span>
+  </h1>
+
+  {% for post in paginator.posts %}
+  <div class="post-preview">
+    <h2 class="post-title">
+      <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+    </h2>
+    <div class="post-meta">
+      <span>{{ post.date | date: "%Y年%m月%d日" }}</span>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if paginator.total_pages > 1 %}
+<div class="pagination">
+  {% if paginator.previous_page %}
+    <a href="{{ paginator.previous_page_path | relative_url }}" class="previous">Newer Posts</a>
+  {% else %}
+    <span class="previous">Newer Posts</span>
+  {% endif %}
+  
+  <span class="page_number">Page {{ paginator.page }} of {{ paginator.total_pages }}</span>
+  
+  {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path | relative_url }}" class="next">Older Posts</a>
+  {% else %}
+    <span class="next">Older Posts</span>
+  {% endif %}
+</div>
+{% endif %}

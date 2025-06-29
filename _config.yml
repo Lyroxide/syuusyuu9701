@@ -1,0 +1,30 @@
+title: Archive of blog.goo.ne.jp/syuusyuu9701
+author: syuusyuu9701
+description: >-
+  Originally hosted at https://blog.goo.ne.jp/syuusyuu9701
+  Preserved before its shutdown.
+
+baseurl: /syuusyuu9701
+url: "https://lyroxide.github.io"
+
+theme: jekyll-theme-chirpy
+chirpy_theme:
+  skin: auto
+
+plugins:
+  - jekyll-paginate-v2
+
+pagination:
+  enabled: true
+  per_page: 5
+  permalink: /page/:num/
+  sort_field: "date"
+  sort_reverse: true
+
+autopages:
+  enabled: true
+  categories:
+    layout: "category"
+    permalink: "/categories/:cat/"
+    paginate: 5
+    title: "Category: :cat"
