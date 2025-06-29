@@ -1,28 +1,20 @@
-# .github/workflows/jekyll.yml
-
 name: Deploy Jekyll site to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Build job
   build:
     runs-on: ubuntu-latest
     steps:
@@ -32,21 +24,14 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
-          # This caches the installed gems from your Gemfile to speed up future builds
           bundler-cache: true 
-
       - name: Build with Jekyll
-        # This is the line we are fixing.
-        # We are explicitly telling the build command what the base URL is.
-        run: bundle exec jekyll build --baseurl "/syuusyuu9701"
+        run: bundle exec jekyll build
         env:
           JEKYLL_ENV: production
-
       - name: Upload artifact
-        # This uploads the built '_site' folder for the deployment job
         uses: actions/upload-pages-artifact@v3
 
-  # Deployment job
   deploy:
     environment:
       name: github-pages
