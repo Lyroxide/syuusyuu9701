@@ -1,26 +1,11 @@
-# ----- Site Info -----
 title: Archive of blog.goo.ne.jp/syuusyuu9701
-tagline: An archived blog.
 author: syuusyuu9701
 description: An archive of the blog originally hosted at https://blog.goo.ne.jp/syuusyuu9701.
+
+theme: minima
+
+plugins:
+  - jekyll-feed
+
 baseurl: "/syuusyuu9701"
 url: "https://lyroxide.github.io"
-
-# ----- Theme & Look -----
-theme: jekyll-theme-chirpy
-chirpy_theme:
-  skin: auto
-  pagination:
-    enabled: true
-    per_page: 10
-
-# ----- Navigation Tabs -----
-tabs:
-  - title: Categories
-    url: /categories/
-
-# ----- Plugins -----
-plugins:
-  - jekyll-seo-tag
-  - jekyll-feed
-  - jekyll-sitemap
