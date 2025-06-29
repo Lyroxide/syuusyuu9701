@@ -1,0 +1,41 @@
+---
+# This tells our layout to use the main 'default' layout from the Chirpy theme as its base.
+layout: default
+---
+
+<div class="page-content">
+  <h1 class="page-title">
+    {{ page.title }}
+  </h1>
+  <hr>
+
+  <ul class="post-list">
+    {% for post in paginator.posts %}
+      <li>
+        <h2 class="post-title" style="margin-bottom: 0.2rem;">
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+        </h2>
+        <span class="post-meta">{{ post.date | date: "%Y年%m月%d日" }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+
+  {% if paginator.total_pages > 1 %}
+    <div class="pagination">
+      {% if paginator.previous_page %}
+        <a href="{{ paginator.previous_page_path | relative_url }}" class="previous">Newer Posts</a>
+      {% else %}
+        <span class="previous" style="color: grey;">Newer Posts</span>
+      {% endif %}
+      
+      <span class="page_number" style="margin: 0 1em;">Page {{ paginator.page }} of {{ paginator.total_pages }}</span>
+      
+      {% if paginator.next_page %}
+        <a href="{{ paginator.next_page_path | relative_url }}" class="next">Older Posts</a>
+      {% else %}
+        <span class="next" style="color: grey;">Older Posts</span>
+      {% endif %}
+    </div>
+  {% endif %}
+
+</div>
