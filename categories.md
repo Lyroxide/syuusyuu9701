@@ -4,7 +4,7 @@ layout: page
 title: Categories
 ---
 
-カテゴリー
+Here is a list of all post categories in this archive.
 
 <div id="category-list" class="mt-4">
   {% for category in site.categories %}
