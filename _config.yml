@@ -10,6 +10,9 @@ url: "https://lyroxide.github.io"
 theme: jekyll-theme-chirpy
 chirpy_theme:
   skin: auto
+  pagination:
+    enabled: true
+    per_page: 10
 
 # ----- Navigation Tabs -----
 tabs:
@@ -18,24 +21,6 @@ tabs:
 
 # ----- Plugins -----
 plugins:
-  - jekyll-paginate-v2
   - jekyll-seo-tag
   - jekyll-feed
   - jekyll-sitemap
-
-# ----- Pagination & Autopages -----
-# This configuration will generate our paginated category pages.
-pagination:
-  enabled: true
-  per_page: 10
-  permalink: /page/:num/
-  sort_field: "date"
-  sort_reverse: true
-
-autopages:
-  enabled: true
-  categories:
-    layout: 'category_page.html'  # Use the new, non-conflicting layout file
-    permalink: '/categories/:cat/'
-    title: 'Category: :cat'
-    paginate: 10
