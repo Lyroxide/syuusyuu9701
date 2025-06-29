@@ -8,6 +8,10 @@ description: >-
 baseurl: /syuusyuu9701
 url: "https://lyroxide.github.io"
 
+tabs:
+  - title: Categories
+    url: /categories/
+
 theme: jekyll-theme-chirpy
 chirpy_theme:
   skin: auto
