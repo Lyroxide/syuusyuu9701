@@ -4,159 +4,167 @@ title: Categories
 permalink: /categories/
 ---
 
-<div id="category-buttons" class="mb-4">
-  <button class="btn btn-outline-primary active" onclick="filterPosts('all')">All Posts</button>
-  {% assign categories = site.categories | sort %}
-  {% for category in categories %}
-    <button class="btn btn-outline-primary" onclick="filterPosts('{{ category[0] | escape }}')">{{ category[0] }} ({{ category[1].size }})</button>
-  {% endfor %}
+<div class="categories">
+  <h2 class="post-list-heading">Categories</h2>
+  
+  <div class="category-list">
+    <a href="javascript:;" data-category="all" class="category-link active">
+      All
+    </a>
+    
+    {% assign categories = site.categories | sort %}
+    {% for category in categories %}
+      <a href="javascript:;" data-category="{{ category[0] | escape }}" class="category-link">
+        {{ category[0] }} ({{ category[1].size }})
+      </a>
+    {% endfor %}
+  </div>
+  
+  <div class="post-wrapper">
+    <div id="post-list">
+      {% for post in site.posts %}
+        <div class="post-item" data-category="{{ post.categories | first | escape }}">
+          <h3 class="post-title">
+            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          </h3>
+          <span class="post-date">{{ post.date | date: "%Y年%m月%d日" }}</span>
+        </div>
+      {% endfor %}
+    </div>
+    
+    <div id="pagination" class="pagination">
+      <button id="prev-page" class="btn btn-sm btn-outline-primary" disabled>Previous</button>
+      <span id="page-indicator">Page 1</span>
+      <button id="next-page" class="btn btn-sm btn-outline-primary">Next</button>
+    </div>
+  </div>
 </div>
-
-<div id="pagination-controls" class="mt-4">
-  <button id="prev-page" class="btn btn-sm btn-outline-secondary" onclick="prevPage()" disabled>Previous</button>
-  <span id="page-indicator" class="mx-2">Page 1</span>
-  <button id="next-page" class="btn btn-sm btn-outline-secondary" onclick="nextPage()">Next</button>
-</div>
-
-<ul id="post-list" class="post-list">
-  {% for post in site.posts %}
-    <li class="post-item" data-category="{{ post.categories | first | escape }}">
-      <h2 class="post-title">
-        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-      </h2>
-      <span class="post-meta">{{ post.date | date: "%Y年%m月%d日" }}</span>
-    </li>
-  {% endfor %}
-</ul>
 
 <style>
-  #category-buttons .btn {
-    margin: 0.25rem;
+  .category-list {
+    margin-bottom: 2rem;
   }
   
-  .btn.active {
+  .category-link {
+    display: inline-block;
+    margin: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #007bff;
+    border-radius: 0.25rem;
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .category-link.active {
     background-color: #007bff;
     color: white;
-  }
-  
-  #pagination-controls {
-    text-align: center;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
   }
   
   .post-item {
     margin-bottom: 1.5rem;
     display: none;
   }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+  }
+  
+  .pagination button {
+    margin: 0 0.5rem;
+  }
+  
+  #page-indicator {
+    margin: 0 0.5rem;
+  }
 </style>
 
 <script>
-  // Global variables
-  let currentCategory = 'all';
-  let currentPage = 1;
-  const postsPerPage = 5;
-  let filteredPosts = [];
-  
-  // DOM elements
-  const postItems = document.querySelectorAll('.post-item');
-  const categoryButtons = document.querySelectorAll('#category-buttons .btn');
-  const prevPageBtn = document.getElementById('prev-page');
-  const nextPageBtn = document.getElementById('next-page');
-  const pageIndicator = document.getElementById('page-indicator');
-  
-  // Initialize on page load
   document.addEventListener('DOMContentLoaded', function() {
-    // Check for hash in URL
-    const hash = window.location.hash.substring(1);
-    if (hash) {
-      filterPosts(decodeURIComponent(hash));
-    } else {
-      filterPosts('all');
+    // Variables
+    const postsPerPage = 5;
+    let currentPage = 1;
+    let currentCategory = 'all';
+    
+    // DOM elements
+    const categoryLinks = document.querySelectorAll('.category-link');
+    const postItems = document.querySelectorAll('.post-item');
+    const prevPageBtn = document.getElementById('prev-page');
+    const nextPageBtn = document.getElementById('next-page');
+    const pageIndicator = document.getElementById('page-indicator');
+    
+    // Helper function to show posts for current page and category
+    function updateDisplay() {
+      // Get posts for current category
+      const filteredPosts = Array.from(postItems).filter(post => {
+        return currentCategory === 'all' || post.dataset.category === currentCategory;
+      });
+      
+      // Calculate pagination
+      const totalPages = Math.max(1, Math.ceil(filteredPosts.length / postsPerPage));
+      const startIndex = (currentPage - 1) * postsPerPage;
+      const endIndex = Math.min(startIndex + postsPerPage, filteredPosts.length);
+      
+      // Update pagination controls
+      pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+      prevPageBtn.disabled = currentPage <= 1;
+      nextPageBtn.disabled = currentPage >= totalPages;
+      
+      // Hide all posts
+      postItems.forEach(post => {
+        post.style.display = 'none';
+      });
+      
+      // Show posts for current page
+      for (let i = startIndex; i < endIndex; i++) {
+        if (filteredPosts[i]) {
+          filteredPosts[i].style.display = 'block';
+        }
+      }
     }
     
-    // Handle browser back/forward
-    window.addEventListener('popstate', function() {
-      const hash = window.location.hash.substring(1);
-      if (hash) {
-        filterPosts(decodeURIComponent(hash));
-      } else {
-        filterPosts('all');
-      }
-    });
-  });
-  
-  // Filter posts by category
-  function filterPosts(category) {
-    currentCategory = category;
-    currentPage = 1;
-    
-    // Update active button
-    categoryButtons.forEach(function(button) {
-      if (button.textContent.includes(category) || 
-         (category === 'all' && button.textContent.includes('All Posts'))) {
-        button.classList.add('active');
-      } else {
-        button.classList.remove('active');
-      }
+    // Category link click handler
+    categoryLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Update active category
+        categoryLinks.forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update current category and reset to page 1
+        currentCategory = this.dataset.category;
+        currentPage = 1;
+        
+        // Update display
+        updateDisplay();
+      });
     });
     
-    // Filter posts
-    filteredPosts = [];
-    postItems.forEach(function(item) {
-      if (category === 'all' || item.dataset.category === category) {
-        filteredPosts.push(item);
+    // Pagination button handlers
+    prevPageBtn.addEventListener('click', function() {
+      if (currentPage > 1) {
+        currentPage--;
+        updateDisplay();
       }
     });
     
-    // Update URL
-    if (category === 'all') {
-      history.replaceState(null, null, window.location.pathname);
-    } else {
-      history.pushState(null, null, '#' + category);
-    }
+    nextPageBtn.addEventListener('click', function() {
+      const filteredPosts = Array.from(postItems).filter(post => {
+        return currentCategory === 'all' || post.dataset.category === currentCategory;
+      });
+      
+      const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+      
+      if (currentPage < totalPages) {
+        currentPage++;
+        updateDisplay();
+      }
+    });
     
-    // Update display
+    // Initialize display
     updateDisplay();
-  }
-  
-  // Update display based on current page and filter
-  function updateDisplay() {
-    // Calculate pagination
-    const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
-    const startIndex = (currentPage - 1) * postsPerPage;
-    const endIndex = Math.min(startIndex + postsPerPage, filteredPosts.length);
-    
-    // Update pagination controls
-    pageIndicator.textContent = 'Page ' + currentPage + ' of ' + (totalPages || 1);
-    prevPageBtn.disabled = currentPage <= 1;
-    nextPageBtn.disabled = currentPage >= totalPages;
-    
-    // Hide all posts
-    postItems.forEach(function(item) {
-      item.style.display = 'none';
-    });
-    
-    // Show only current page posts
-    for (let i = startIndex; i < endIndex; i++) {
-      filteredPosts[i].style.display = 'block';
-    }
-  }
-  
-  // Go to previous page
-  function prevPage() {
-    if (currentPage > 1) {
-      currentPage--;
-      updateDisplay();
-    }
-  }
-  
-  // Go to next page
-  function nextPage() {
-    const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
-    if (currentPage < totalPages) {
-      currentPage++;
-      updateDisplay();
-    }
-  }
+  });
 </script>
