@@ -1,24 +1,41 @@
+# ----- Site Info -----
 title: Archive of blog.goo.ne.jp/syuusyuu9701
 tagline: An archived blog.
 author: syuusyuu9701
-description: >-
-  An archive of the blog originally hosted at https://blog.goo.ne.jp/syuusyuu9701.
-  Preserved before its shutdown.
+description: An archive of the blog originally hosted at https://blog.goo.ne.jp/syuusyuu9701.
 baseurl: "/syuusyuu9701"
 url: "https://lyroxide.github.io"
 
+# ----- Theme & Look -----
 theme: jekyll-theme-chirpy
 chirpy_theme:
   skin: auto
-  pagination:
-    enabled: true
-    per_page: 5
 
+# ----- Navigation Tabs -----
 tabs:
   - title: Categories
     url: /categories/
 
+# ----- Plugins -----
 plugins:
+  - jekyll-paginate-v2
   - jekyll-seo-tag
   - jekyll-feed
   - jekyll-sitemap
+
+# ----- Pagination & Autopages -----
+# This configuration will generate our paginated category pages.
+pagination:
+  enabled: true
+  per_page: 10
+  permalink: /page/:num/
+  sort_field: "date"
+  sort_reverse: true
+
+autopages:
+  enabled: true
+  categories:
+    layout: 'category_page.html'  # Use the new, non-conflicting layout file
+    permalink: '/categories/:cat/'
+    title: 'Category: :cat'
+    paginate: 10
