@@ -4,8 +4,8 @@ title: Categories
 permalink: /categories/
 ---
 
-<!-- This section lists all the category names as clickable buttons -->
-<!-- We've added a data-category attribute for more reliable matching -->
+<!-- This section lists all the category names as clickable buttons.
+     The 'onclick' attributes have been REMOVED. -->
 <div id="category-buttons" class="mb-4">
   <button class="btn btn-outline-primary" data-category="all">All Posts</button>
   {% assign categories = site.categories | sort %}
@@ -26,7 +26,7 @@ permalink: /categories/
   {% endfor %}
 </ul>
 
-<!-- This is the new, robust JavaScript -->
+<!-- This is the final, correct JavaScript -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const postList = document.getElementById('post-list-all');
@@ -35,38 +35,30 @@ permalink: /categories/
     const postItems = Array.from(postList.getElementsByClassName('post-item'));
     const categoryButtons = document.querySelectorAll('#category-buttons .btn');
 
+    // This function is now defined inside the DOMContentLoaded listener,
+    // so it's guaranteed to exist before any events are attached.
     function filterPosts(category) {
-      // Update active button state
       categoryButtons.forEach(button => {
-        if (button.dataset.category === category) {
-          button.classList.add('active');
-        } else {
-          button.classList.remove('active');
-        }
+        button.classList.toggle('active', button.dataset.category === category);
       });
 
-      // Show/hide posts based on the data-category attribute
-      let postsFound = false;
       postItems.forEach(item => {
-        if (category === 'all' || item.dataset.category === category) {
-          item.style.display = 'list-item';
-          postsFound = true;
-        } else {
-          item.style.display = 'none';
-        }
+        const shouldBeVisible = (category === 'all' || item.dataset.category === category);
+        item.style.display = shouldBeVisible ? 'list-item' : 'none';
       });
     }
 
-    // Add click event listeners to all buttons
+    // This is the FIX. We attach listeners here instead of using onclick.
     categoryButtons.forEach(button => {
       button.addEventListener('click', function() {
-        // Use the button's data-category to filter
         const categoryToFilter = this.dataset.category;
         filterPosts(categoryToFilter);
+        
         // Update the URL hash without reloading the page
         if (history.pushState) {
           if (categoryToFilter === 'all') {
-            history.pushState(null, null, '#');
+            // Use replaceState for the default to not clutter history
+            history.replaceState(null, null, window.location.pathname + window.location.search);
           } else {
             history.pushState(null, null, '#' + encodeURIComponent(categoryToFilter));
           }
@@ -74,8 +66,7 @@ permalink: /categories/
       });
     });
 
-    // This is the fix for links from other pages
-    // Check for a category in the URL hash when the page loads
+    // This part handles links from other pages (e.g., from a post page)
     function filterByUrlHash() {
       const hash = decodeURIComponent(window.location.hash.substring(1));
       if (hash) {
@@ -85,8 +76,11 @@ permalink: /categories/
       }
     }
     
-    // Initial filter on page load
+    // Initial filter when the page loads
     filterByUrlHash();
+
+    // Listen for back/forward browser button presses
+    window.addEventListener('popstate', filterByUrlHash);
   });
 </script>
 
