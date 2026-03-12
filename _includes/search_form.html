@@ -1,0 +1,17 @@
+<form{% if include.form_id %} id="{{ include.form_id }}"{% endif %} class="search-form" action="{{ '/search/' | relative_url }}" method="get">
+  <div>
+    <label for="{{ include.input_id | default: 'site-search-query' }}">
+      {{ include.label | default: '検索' }}
+    </label>
+    <input
+      id="{{ include.input_id | default: 'site-search-query' }}"
+      name="q"
+      type="search"
+      value="{{ include.value | default: '' | escape }}"
+      placeholder="{{ include.placeholder | default: '語句や漢字で検索' }}"
+      autocomplete="off">
+  </div>
+  <div>
+    <button type="submit">{{ include.button_label | default: '検索' }}</button>
+  </div>
+</form>

@@ -1,0 +1,76 @@
+---
+layout: default
+---
+{% assign primary_category = page.categories | first %}
+{% assign previous_post = nil %}
+{% assign next_post = nil %}
+
+{% if primary_category %}
+  {% assign category_posts = site.categories[primary_category] %}
+  {% assign current_index = nil %}
+
+  {% for category_post in category_posts %}
+    {% if category_post.url == page.url %}
+      {% assign current_index = forloop.index0 %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+
+  {% if current_index != nil %}
+    {% assign previous_index = current_index | plus: 1 %}
+    {% assign next_index = current_index | minus: 1 %}
+
+    {% if previous_index < category_posts.size %}
+      {% assign previous_post = category_posts[previous_index] %}
+    {% endif %}
+
+    {% if next_index >= 0 %}
+      {% assign next_post = category_posts[next_index] %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+<article class="container reading-width">
+  <header>
+    <h1 class="page-title">{{ page.title | escape }}</h1>
+    <div class="article-meta">
+      <span>{{ page.date | date: "%Y.%m.%d" }}</span>
+      {% if primary_category %}
+        <a href="{{ '/category/' | relative_url }}{{ primary_category | url_encode }}.html">{{ primary_category }}</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="article-content">
+    {{ content }}
+  </div>
+
+  {% if primary_category %}
+    <nav class="post-pagination" aria-label="Category post navigation">
+      {% if previous_post %}
+        <a class="pagination-link" href="{{ previous_post.url | relative_url }}">
+          <span class="pagination-label">Previous</span>
+          {{ previous_post.title | escape }}
+        </a>
+      {% else %}
+        <div class="pagination-link is-empty" aria-hidden="true"></div>
+      {% endif %}
+
+      <a class="pagination-link pagination-center" href="{{ '/category/' | relative_url }}{{ primary_category | url_encode }}.html">
+        <span>
+          <span class="pagination-label">Category</span>
+          {{ primary_category }}
+        </span>
+      </a>
+
+      {% if next_post %}
+        <a class="pagination-link" href="{{ next_post.url | relative_url }}">
+          <span class="pagination-label">Next</span>
+          {{ next_post.title | escape }}
+        </a>
+      {% else %}
+        <div class="pagination-link is-empty" aria-hidden="true"></div>
+      {% endif %}
+    </nav>
+  {% endif %}
+</article>

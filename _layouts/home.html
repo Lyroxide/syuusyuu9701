@@ -1,0 +1,17 @@
+---
+layout: default
+---
+<section class="container wide-width">
+  <header class="reading-width">
+    <h1 class="page-title">{{ page.title | default: 'カテゴリー' | escape }}</h1>
+    <div class="page-intro">
+      {{ content }}
+    </div>
+  </header>
+
+  {% include search_form.html input_id='home-search-query' %}
+
+  <div style="height: 24px;"></div>
+
+  {% include category_list.html %}
+</section>

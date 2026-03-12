@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if page.title %}{{ page.title | escape }} | {% endif %}{{ site.author | default: site.title | escape }}</title>
+    <meta name="description" content="{{ page.description | default: site.description | strip_html | strip_newlines | escape }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --bg: #f7f2ea;
+        --surface: #fffdfa;
+        --text: #2b241c;
+        --muted: #6b6156;
+        --line: #d9cfc2;
+        --accent: #70573c;
+        --accent-strong: #523d28;
+        --surface-hover: #fbf6ef;
+        --mark: #f2df9d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        font-size: 16px;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.85;
+        text-rendering: optimizeLegibility;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration-thickness: 0.08em;
+        text-underline-offset: 0.18em;
+      }
+
+      a:hover {
+        color: var(--accent-strong);
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .site-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .site-header {
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .header-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .site-title {
+        color: var(--text);
+        font-size: 1.15rem;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .site-nav {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      .header-tools {
+        display: flex;
+        align-items: flex-end;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .site-nav > a {
+        color: var(--text);
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        padding: 6px 0;
+      }
+
+      .site-nav > a:hover,
+      .site-nav > a[aria-current="page"] {
+        border-bottom-color: var(--accent);
+      }
+
+      .search-form {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .search-form label {
+        display: block;
+        font-size: 0.82rem;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+
+      .search-form input[type="search"] {
+        min-width: 220px;
+        width: min(100%, 320px);
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        color: var(--text);
+      }
+
+      .search-form input[type="search"]:focus {
+        outline: 2px solid rgba(112, 87, 60, 0.16);
+        outline-offset: 0;
+        border-color: var(--accent);
+      }
+
+      .search-form button,
+      .button {
+        display: inline-block;
+        padding: 10px 14px;
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        background: var(--accent);
+        color: #fffdfa;
+        text-decoration: none;
+      }
+
+      .search-form button:hover,
+      .button:hover {
+        background: var(--accent-strong);
+        border-color: var(--accent-strong);
+        color: #fffdfa;
+      }
+
+      .site-main {
+        flex: 1;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 32px 20px 56px;
+      }
+
+      .reading-width {
+        max-width: 760px;
+      }
+
+      .wide-width {
+        max-width: 920px;
+      }
+
+      .page-title {
+        margin: 0 0 12px;
+        font-size: clamp(1.7rem, 1.35rem + 1vw, 2.2rem);
+        line-height: 1.4;
+        font-weight: 700;
+      }
+
+      .page-intro {
+        margin: 0 0 24px;
+        color: var(--muted);
+      }
+
+      .page-intro p {
+        margin: 0;
+      }
+
+      .list-surface {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+      }
+
+      .category-list,
+      .post-list,
+      .search-results {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .category-list li + li,
+      .post-list li + li,
+      .search-results li + li {
+        border-top: 1px solid var(--line);
+      }
+
+      .category-link-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px 16px;
+        align-items: center;
+        padding: 16px 18px;
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .category-link-row:hover {
+        background: var(--surface-hover);
+      }
+
+      .category-name {
+        font-weight: 700;
+      }
+
+      .category-meta,
+      .post-date,
+      .post-meta,
+      .article-meta,
+      .search-status,
+      .pagination-label {
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+
+      .post-list-item,
+      .search-result {
+        padding: 16px 18px;
+      }
+
+      .post-list-item h2,
+      .search-result-title {
+        margin: 8px 0 0;
+        font-size: 1.18rem;
+        line-height: 1.55;
+      }
+
+      .post-list-item a,
+      .search-result-title a {
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .post-list-item a:hover,
+      .search-result-title a:hover {
+        color: var(--accent);
+      }
+
+      .article-meta {
+        display: flex;
+        gap: 12px 18px;
+        flex-wrap: wrap;
+        margin-bottom: 28px;
+      }
+
+      .article-content {
+        font-size: clamp(1rem, 0.96rem + 0.25vw, 1.12rem);
+        line-height: 2.05;
+        overflow-wrap: break-word;
+      }
+
+      .article-content p,
+      .article-content ul,
+      .article-content ol,
+      .article-content blockquote,
+      .article-content pre,
+      .article-content table {
+        margin: 0 0 1.2em;
+      }
+
+      .article-content h2 {
+        margin: 1.8em 0 0.6em;
+        font-size: 1.4rem;
+        line-height: 1.5;
+      }
+
+      .article-content h3 {
+        margin: 1.5em 0 0.5em;
+        font-size: 1.2rem;
+        line-height: 1.5;
+      }
+
+      .article-content hr {
+        border: 0;
+        border-top: 1px solid var(--line);
+        margin: 2rem 0;
+      }
+
+      .article-content blockquote {
+        padding-left: 1rem;
+        border-left: 3px solid var(--line);
+      }
+
+      .article-content table {
+        width: 100%;
+        border-collapse: collapse;
+        display: block;
+        overflow-x: auto;
+      }
+
+      .article-content th,
+      .article-content td {
+        border: 1px solid var(--line);
+        padding: 10px 12px;
+        text-align: left;
+      }
+
+      mark {
+        background: var(--mark);
+        color: inherit;
+        padding: 0 0.12em;
+      }
+
+      .post-pagination {
+        margin-top: 40px;
+        padding-top: 24px;
+        border-top: 1px solid var(--line);
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .pagination-link {
+        display: block;
+        min-height: 100%;
+        padding: 14px 16px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .pagination-link:hover {
+        background: var(--surface-hover);
+      }
+
+      .pagination-link.is-empty {
+        visibility: hidden;
+      }
+
+      .pagination-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .search-category {
+        margin-bottom: 20px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+      }
+
+      .search-category header {
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .search-category h2 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .search-snippet {
+        margin: 10px 0 0;
+      }
+
+      .site-footer {
+        background: var(--surface);
+        border-top: 1px solid var(--line);
+      }
+
+      .footer-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 16px 20px 22px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      @media (max-width: 740px) {
+        .header-inner {
+          align-items: flex-start;
+        }
+
+        .site-nav {
+          width: auto;
+        }
+
+        .header-tools {
+          width: 100%;
+        }
+
+        .search-form {
+          width: 100%;
+        }
+
+        .search-form > div:first-child {
+          flex: 1 1 100%;
+        }
+
+        .search-form input[type="search"] {
+          width: 100%;
+          min-width: 0;
+        }
+
+        .container {
+          padding: 24px 16px 40px;
+        }
+
+        .category-link-row {
+          grid-template-columns: 1fr;
+        }
+
+        .article-content {
+          line-height: 1.9;
+        }
+
+        .post-pagination {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="site-title" href="{{ '/' | relative_url }}">{{ site.author | default: site.title }}</a>
+          <div class="header-tools">
+            <nav class="site-nav" aria-label="Primary">
+              <a href="{{ '/' | relative_url }}"{% if page.url == '/' or page.url == '/categories/' or page.layout == 'category_page' %} aria-current="page"{% endif %}>カテゴリー</a>
+              <a href="{{ '/search/' | relative_url }}"{% if page.url == '/search/' %} aria-current="page"{% endif %}>検索</a>
+            </nav>
+            {% include search_form.html input_id='header-search-query' %}
+          </div>
+        </div>
+      </header>
+
+      <main class="site-main">
+        {{ content }}
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-inner">
+          {{ site.description }}
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

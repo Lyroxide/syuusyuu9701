@@ -1,18 +1,26 @@
 ---
 layout: default
 ---
-<h1>{{ page.category_name }}</h1>
-<hr>
+{% assign category_posts = site.categories[page.category_name] %}
 
-<ul>
-  {% for post in site.posts %}
-    {% if post.categories contains page.category_name %}
-      <li>
-        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
-        <h2>
-          <a class="post-link" href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>
-        </h2>
-      </li>
-    {% endif %}
-  {% endfor %}
-</ul>
+<section class="container wide-width">
+  <header class="reading-width">
+    <h1 class="page-title">{{ page.category_name }}</h1>
+    <p class="page-intro">
+      <a href="{{ '/' | relative_url }}">カテゴリー一覧に戻る</a>
+    </p>
+  </header>
+
+  <div class="list-surface">
+    <ul class="post-list">
+      {% for post in category_posts %}
+        <li class="post-list-item">
+          <div class="post-date">{{ post.date | date: "%Y.%m.%d" }}</div>
+          <h2>
+            <a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>
+          </h2>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>

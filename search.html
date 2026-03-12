@@ -1,0 +1,241 @@
+---
+layout: default
+title: 検索
+permalink: /search/
+---
+<section class="container wide-width">
+  <header class="reading-width">
+    <h1 class="page-title">検索</h1>
+    <p class="page-intro">記事タイトルと本文を検索し、結果をカテゴリーごとにまとめて表示します。</p>
+  </header>
+
+  {% include search_form.html form_id='search-page-form' input_id='search-page-query' %}
+
+  <p id="search-status" class="search-status">語句を入力すると、カテゴリー別に結果を表示します。</p>
+  <div id="search-results-root" data-endpoint="{{ '/search.json' | relative_url }}" data-category-base="{{ '/category/' | relative_url }}"></div>
+</section>
+
+<script>
+  (function () {
+    var form = document.getElementById('search-page-form');
+    var input = document.getElementById('search-page-query');
+    var statusNode = document.getElementById('search-status');
+    var resultsRoot = document.getElementById('search-results-root');
+    var searchEndpoint = resultsRoot.getAttribute('data-endpoint');
+    var categoryBase = resultsRoot.getAttribute('data-category-base');
+    var params = new URLSearchParams(window.location.search);
+    var initialQuery = (params.get('q') || '').trim();
+    var postsPromise;
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeRegExp(value) {
+      return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function normalize(value) {
+      return (value || '').toLocaleLowerCase('ja').replace(/\s+/g, ' ').trim();
+    }
+
+    function readTerms(query) {
+      return query.split(/\s+/).map(function (term) {
+        return term.trim();
+      }).filter(Boolean);
+    }
+
+    function buildSnippet(text, terms) {
+      var normalizedText = (text || '').replace(/\s+/g, ' ').trim();
+      var loweredText = normalize(normalizedText);
+      var firstIndex = -1;
+      var firstLength = 0;
+
+      if (!normalizedText) {
+        return '';
+      }
+
+      terms.forEach(function (term) {
+        var matchIndex = loweredText.indexOf(normalize(term));
+        if (matchIndex !== -1 && (firstIndex === -1 || matchIndex < firstIndex)) {
+          firstIndex = matchIndex;
+          firstLength = term.length;
+        }
+      });
+
+      if (firstIndex === -1) {
+        return normalizedText.length > 120 ? normalizedText.slice(0, 120) + '…' : normalizedText;
+      }
+
+      var start = Math.max(0, firstIndex - 48);
+      var end = Math.min(normalizedText.length, firstIndex + firstLength + 72);
+      var prefix = start > 0 ? '…' : '';
+      var suffix = end < normalizedText.length ? '…' : '';
+      return prefix + normalizedText.slice(start, end).trim() + suffix;
+    }
+
+    function snippetSource(post, terms) {
+      var content = post.content || '';
+      var title = post.title || '';
+      var normalizedContent = normalize(content);
+      var hasContentMatch = terms.some(function (term) {
+        return normalizedContent.indexOf(normalize(term)) !== -1;
+      });
+
+      return hasContentMatch ? content : title;
+    }
+
+    function highlightSnippet(snippet, terms) {
+      var safeSnippet = escapeHtml(snippet);
+      var pattern = terms
+        .filter(Boolean)
+        .sort(function (left, right) { return right.length - left.length; })
+        .map(escapeRegExp)
+        .join('|');
+
+      if (!pattern) {
+        return safeSnippet;
+      }
+
+      return safeSnippet.replace(new RegExp('(' + pattern + ')', 'giu'), '<mark>$1</mark>');
+    }
+
+    function loadPosts() {
+      if (!postsPromise) {
+        postsPromise = fetch(searchEndpoint)
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error('Search index request failed.');
+            }
+
+            return response.json();
+          });
+      }
+
+      return postsPromise;
+    }
+
+    function renderResults(query, posts) {
+      var terms = readTerms(query);
+      var matches;
+      var grouped = {};
+      var categories;
+
+      resultsRoot.innerHTML = '';
+
+      if (!terms.length) {
+        statusNode.textContent = '語句を入力すると、カテゴリー別に結果を表示します。';
+        return;
+      }
+
+      matches = posts.filter(function (post) {
+        var haystack = normalize((post.title || '') + ' ' + (post.content || ''));
+        return terms.every(function (term) {
+          return haystack.indexOf(normalize(term)) !== -1;
+        });
+      });
+
+      if (!matches.length) {
+        statusNode.textContent = '「' + query + '」に一致する記事はありませんでした。';
+        return;
+      }
+
+      matches.forEach(function (post) {
+        var postCategories = post.categories && post.categories.length ? post.categories : ['未分類'];
+        postCategories.forEach(function (category) {
+          if (!grouped[category]) {
+            grouped[category] = [];
+          }
+
+          grouped[category].push(post);
+        });
+      });
+
+      categories = Object.keys(grouped).sort(function (left, right) {
+        return left.localeCompare(right, 'ja');
+      });
+
+      statusNode.textContent = '「' + query + '」に一致した記事は ' + matches.length + ' 件です。';
+
+      categories.forEach(function (category) {
+        var section = document.createElement('section');
+        var header = document.createElement('header');
+        var heading = document.createElement('h2');
+        var headingLink = document.createElement('a');
+        var list = document.createElement('ul');
+
+        section.className = 'search-category';
+        list.className = 'search-results';
+
+        headingLink.href = categoryBase + encodeURIComponent(category) + '.html';
+        headingLink.textContent = category;
+        heading.appendChild(headingLink);
+        header.appendChild(heading);
+        section.appendChild(header);
+
+        grouped[category].forEach(function (post) {
+          var item = document.createElement('li');
+          var article = document.createElement('article');
+          var title = document.createElement('h3');
+          var titleLink = document.createElement('a');
+          var meta = document.createElement('div');
+          var snippet = document.createElement('p');
+
+          article.className = 'search-result';
+          title.className = 'search-result-title';
+          meta.className = 'post-meta';
+          snippet.className = 'search-snippet';
+
+          titleLink.href = post.url;
+          titleLink.textContent = post.title;
+          title.appendChild(titleLink);
+
+          meta.textContent = post.date;
+          snippet.innerHTML = highlightSnippet(buildSnippet(snippetSource(post, terms), terms), terms);
+
+          article.appendChild(meta);
+          article.appendChild(title);
+          article.appendChild(snippet);
+          item.appendChild(article);
+          list.appendChild(item);
+        });
+
+        section.appendChild(list);
+        resultsRoot.appendChild(section);
+      });
+    }
+
+    function runSearch(query) {
+      if (!query) {
+        renderResults('', []);
+        return;
+      }
+
+      statusNode.textContent = '検索中です。';
+
+      loadPosts()
+        .then(function (posts) {
+          renderResults(query, posts);
+        })
+        .catch(function () {
+          statusNode.textContent = '検索データを読み込めませんでした。';
+        });
+    }
+
+    input.value = initialQuery;
+    runSearch(initialQuery);
+
+    form.addEventListener('submit', function (event) {
+      var query = input.value.trim();
+
+      event.preventDefault();
+      window.history.replaceState({}, '', query ? '?q=' + encodeURIComponent(query) : window.location.pathname);
+      runSearch(query);
+    });
+  }());
+</script>

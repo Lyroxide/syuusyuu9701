@@ -1,0 +1,21 @@
+{% assign sorted_categories = site.categories | sort %}
+<div class="list-surface">
+  <ul class="category-list">
+    {% for category in sorted_categories %}
+      {% assign category_name = category[0] %}
+      {% assign category_posts = category[1] %}
+      {% assign latest_post = category_posts | first %}
+      <li>
+        <a class="category-link-row" href="{{ '/category/' | relative_url }}{{ category_name | url_encode }}.html">
+          <span class="category-name">{{ category_name }}</span>
+          <span class="category-meta">
+            {{ category_posts.size }}件
+            {% if latest_post %}
+              ・ 最新 {{ latest_post.date | date: "%Y.%m.%d" }}
+            {% endif %}
+          </span>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
