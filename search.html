@@ -11,7 +11,7 @@ permalink: /search/
 
   {% include search_form.html form_id='search-page-form' input_id='search-page-query' %}
 
-  <p id="search-status" class="search-status">語句を入力すると、カテゴリー別に結果を表示します。</p>
+  <p id="search-status" class="search-status" aria-live="polite">語句を入力すると、カテゴリー別に結果を表示します。</p>
   <div id="search-results-root" data-endpoint="{{ '/search.json' | relative_url }}" data-category-base="{{ '/category/' | relative_url }}"></div>
 </section>
 

@@ -10,15 +10,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
       :root {
-        --bg: #f7f2ea;
-        --surface: #fffdfa;
-        --text: #2b241c;
-        --muted: #6b6156;
-        --line: #d9cfc2;
-        --accent: #70573c;
-        --accent-strong: #523d28;
-        --surface-hover: #fbf6ef;
-        --mark: #f2df9d;
+        --bg: #f5f5f4;
+        --surface: #fafaf9;
+        --text: #1c1917;
+        --muted: #57534e;
+        --line: #d6d3d1;
+        --primary: #0891b2;
+        --primary-strong: #0e7490;
+        --secondary: #06b6d4;
+        --accent: #f59e0b;
+        --surface-hover: #f2f7f8;
+        --mark: #fef3c7;
+        --focus-ring: rgba(8, 145, 178, 0.18);
       }
 
       * {
@@ -31,21 +34,21 @@
 
       body {
         margin: 0;
-        font-family: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
+        font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
         background: var(--bg);
         color: var(--text);
-        line-height: 1.85;
+        line-height: 1.8;
         text-rendering: optimizeLegibility;
       }
 
       a {
-        color: var(--accent);
+        color: var(--primary);
         text-decoration-thickness: 0.08em;
         text-underline-offset: 0.18em;
       }
 
       a:hover {
-        color: var(--accent-strong);
+        color: var(--primary-strong);
       }
 
       img {
@@ -117,7 +120,7 @@
 
       .site-nav > a:hover,
       .site-nav > a[aria-current="page"] {
-        border-bottom-color: var(--accent);
+        border-bottom-color: var(--primary);
       }
 
       .search-form {
@@ -145,27 +148,27 @@
       }
 
       .search-form input[type="search"]:focus {
-        outline: 2px solid rgba(112, 87, 60, 0.16);
+        outline: 2px solid var(--focus-ring);
         outline-offset: 0;
-        border-color: var(--accent);
+        border-color: var(--secondary);
       }
 
       .search-form button,
       .button {
         display: inline-block;
         padding: 10px 14px;
-        border: 1px solid var(--accent);
+        border: 1px solid var(--primary);
         border-radius: 8px;
-        background: var(--accent);
-        color: #fffdfa;
+        background: var(--primary);
+        color: var(--surface);
         text-decoration: none;
       }
 
       .search-form button:hover,
       .button:hover {
-        background: var(--accent-strong);
-        border-color: var(--accent-strong);
-        color: #fffdfa;
+        background: var(--primary-strong);
+        border-color: var(--primary-strong);
+        color: var(--surface);
       }
 
       .site-main {
@@ -206,6 +209,10 @@
         background: var(--surface);
         border: 1px solid var(--line);
         border-radius: 10px;
+      }
+
+      .search-form + .list-surface {
+        margin-top: 24px;
       }
 
       .category-list,
@@ -270,7 +277,7 @@
 
       .post-list-item a:hover,
       .search-result-title a:hover {
-        color: var(--accent);
+        color: var(--primary);
       }
 
       .article-meta {
@@ -282,7 +289,7 @@
 
       .article-content {
         font-size: clamp(1rem, 0.96rem + 0.25vw, 1.12rem);
-        line-height: 2.05;
+        line-height: 1.95;
         overflow-wrap: break-word;
       }
 
